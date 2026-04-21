@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>9/11 MINI MART — Shop Tracker</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f3ee;color:#1a1a1a;min-height:100vh;transition:background 0.25s,color 0.25s;}
+.container{max-width:960px;margin:0 auto;padding:1.5rem;}
+
+/* ── DARK MODE ── */
+body.dark{background:#0f0f0f;color:#e8e8e8;}
+body.dark .shop-btn{background:#1e1e1e;border-color:#333;color:#ccc;}
+body.dark .shop-btn.active{background:#e8e8e8;color:#111;border-color:#e8e8e8;}
+body.dark .shop-btn:hover:not(.active){background:#2a2a2a;}
+body.dark .btn-new-shop{color:#666;border-color:#444;}
+body.dark .btn-new-shop:hover{border-color:#ccc;color:#ccc;}
+body.dark .header{border-color:#2a2a2a;}
+body.dark .header h1{color:#e8e8e8;}
+body.dark .hbtn-outline{background:#1e1e1e;border-color:#333;color:#ccc;}
+body.dark .hbtn-outline:hover{background:#2a2a2a;}
+body.dark .hbtn-dark{background:#e8e8e8;color:#111;}
+body.dark .tabs{background:#1a1a1a;border-color:#2a2a2a;}
+body.dark .tab{color:#666;}
+body.dark .tab.active{background:#e8e8e8;color:#111;}
+body.dark .card{background:#1a1a1a;border-color:#2a2a2a;}
+body.dark .card-title{color:#555;}
+body.dark input[type=text],body.dark input[type=number],body.dark input[type=tel],body.dark select,body.dark textarea{background:#111;border-color:#333;color:#e8e8e8;}
+body.dark input:focus,body.dark select:focus,body.dark textarea:focus{border-color:#aaa;}
+body.dark .metric{background:#1a1a1a;border-color:#2a2a2a;}
+body.dark .metric-label{color:#555;}
+body.dark .metric-value{color:#e8e8e8;}
+body.dark .table-wrap{background:#1a1a1a;border-color:#2a2a2a;}
+body.dark thead tr{background:#111;border-color:#2a2a2a;}
+body.dark thead th{color:#555;}
+body.dark tbody tr{border-color:#222;}
+body.dark tbody tr:hover{background:#111;}
+body.dark tbody td{color:#e8e8e8;}
+body.dark .total-row td{background:#111;}
+body.dark .chart-card{background:#1a1a1a;border-color:#2a2a2a;}
+body.dark .date-nav button{background:#1a1a1a;border-color:#333;color:#aaa;}
+body.dark .date-nav button:hover{background:#2a2a2a;}
+body.dark .cur-date{color:#e8e8e8;}
+body.dark .udhaar-alert{background:#2a1a00;border-color:#5a3500;}
+body.dark .stock-bar-wrap{background:#2a2a2a;}
+
+/* ── MODALS ── */
+.modal-bg{position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal-box{background:#fff;border-radius:16px;padding:2rem 1.8rem;width:360px;max-width:94vw;box-shadow:0 8px 40px rgba(0,0,0,0.18);}
+body.dark .modal-box{background:#1a1a1a;border:1px solid #2a2a2a;}
+body.dark .modal-box h3{color:#e8e8e8;}
+body.dark .modal-box label{color:#888;}
+body.dark .modal-box input{background:#111;border-color:#333;color:#e8e8e8;}
+body.dark #lockScreen{background:#0f0f0f;}
+body.dark #lockScreen > div{background:#1a1a1a;border-color:#2a2a2a;}
+body.dark #lockScreen h2{color:#e8e8e8;}
+body.dark #lockScreen input{background:#111;border-color:#333;color:#e8e8e8;}
+
+/* SHOP SWITCHER */
+.shop-bar{display:flex;align-items:center;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;}
+.shop-btn{height:32px;padding:0 14px;border-radius:20px;border:1px solid #ddd;background:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.shop-btn.active{background:#111;color:#fff;border-color:#111;}
+.shop-btn:hover:not(.active){background:#f0efe8;}
+.btn-new-shop{height:32px;padding:0 12px;border-radius:20px;border:1px dashed #aaa;background:transparent;font-size:13px;cursor:pointer;font-family:inherit;color:#888;}
+.btn-new-shop:hover{border-color:#111;color:#111;}
+.del-shop{margin-left:4px;color:#ccc;font-size:11px;cursor:pointer;}
+.del-shop:hover{color:#e24b4a;}
+
+/* HEADER */
+.header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-bottom:1rem;border-bottom:1px solid #dddcd4;margin-bottom:1.25rem;}
+.header h1{font-size:21px;font-weight:700;color:#111;}
+.header p{font-size:13px;color:#888;margin-top:3px;}
+.header-btns{display:flex;gap:7px;flex-wrap:wrap;}
+.hbtn{height:33px;padding:0 13px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;display:flex;align-items:center;gap:5px;}
+.hbtn-outline{background:#fff;border:1px solid #ddd;color:#333;}
+.hbtn-outline:hover{background:#f0efe8;}
+.hbtn-dark{background:#111;border:none;color:#fff;}
+.hbtn-dark:hover{opacity:0.85;}
+
+/* TABS */
+.tabs{display:flex;gap:3px;margin-bottom:1.25rem;background:#fff;border:1px solid #e0dfd7;border-radius:10px;padding:4px;overflow-x:auto;}
+.tab{flex:1;min-width:80px;height:33px;border:none;background:transparent;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;color:#888;font-family:inherit;white-space:nowrap;padding:0 8px;}
+.tab.active{background:#111;color:#fff;}
+
+/* PANEL */
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* DATE NAV */
+.date-nav{display:flex;gap:7px;align-items:center;margin-bottom:1.1rem;flex-wrap:wrap;}
+.date-nav button{height:33px;padding:0 12px;font-size:13px;border-radius:8px;cursor:pointer;background:#fff;border:1px solid #ddd;color:#555;font-family:inherit;}
+.date-nav button:hover{background:#f0efe8;}
+.cur-date{font-size:15px;font-weight:700;color:#111;min-width:210px;text-align:center;}
+.today-btn{background:#111!important;color:#fff!important;border-color:#111!important;}
+
+/* CARDS */
+.card{background:#fff;border:1px solid #e0dfd7;border-radius:12px;padding:14px;margin-bottom:1.1rem;}
+.card-title{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:11px;}
+
+/* INPUTS */
+.row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+input[type=text],input[type=number],input[type=tel],select,textarea{font-size:14px;height:37px;padding:0 11px;border:1px solid #ddd;border-radius:8px;background:#fafaf8;color:#111;font-family:inherit;outline:none;}
+input[type=text]:focus,input[type=number]:focus,input[type=tel]:focus,select:focus,textarea:focus{border-color:#111;}
+textarea{height:auto;padding:8px 11px;min-height:60px;resize:vertical;}
+.btn{height:37px;padding:0 16px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;border:none;font-family:inherit;}
+.btn-black{background:#111;color:#fff;}
+.btn-black:hover{opacity:0.85;}
+.btn-red{background:#c0392b;color:#fff;}
+.btn-red:hover{opacity:0.85;}
+.btn-green{background:#2a7a2a;color:#fff;}
+.btn-green:hover{opacity:0.85;}
+.btn-wa{background:#25D366;color:#fff;}
+.btn-wa:hover{opacity:0.85;}
+
+/* SUMMARY METRICS */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px;margin-bottom:1.1rem;}
+.metric{background:#fff;border:1px solid #e0dfd7;border-radius:11px;padding:.9rem 1rem;}
+.metric-label{font-size:11px;color:#999;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;}
+.metric-value{font-size:19px;font-weight:700;color:#111;}
+.metric-value.green{color:#2a7a2a;}
+.metric-value.red{color:#c0392b;}
+.metric-value.orange{color:#e65100;}
+
+/* TABLE */
+.table-wrap{background:#fff;border:1px solid #e0dfd7;border-radius:12px;overflow:auto;margin-bottom:1.1rem;}
+table{width:100%;border-collapse:collapse;font-size:14px;}
+thead tr{background:#fafaf8;border-bottom:1px solid #e5e4dc;}
+thead th{text-align:left;padding:8px 11px;font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;}
+tbody tr{border-bottom:1px solid #f2f1ea;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:#fafaf8;}
+tbody td{padding:9px 11px;color:#1a1a1a;vertical-align:middle;}
+.del-btn{background:none;border:none;cursor:pointer;color:#ccc;font-size:13px;padding:2px 5px;border-radius:4px;}
+.del-btn:hover{color:#e24b4a;background:#fce8e8;}
+.empty{text-align:center;padding:2rem;color:#bbb;font-size:14px;}
+.total-row td{background:#fafaf8;font-weight:700;}
+
+/* BADGES */
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;}
+.b-food{background:#e8f5e9;color:#2a7a2a;}
+.b-drinks{background:#e3f2fd;color:#1565c0;}
+.b-snacks{background:#fff3e0;color:#e65100;}
+.b-household{background:#fce4ec;color:#880e4f;}
+.b-other{background:#f3e5f5;color:#6a1b9a;}
+.b-paid{background:#e8f5e9;color:#2a7a2a;}
+.b-unpaid{background:#fce4ec;color:#c0392b;}
+.b-partial{background:#fff3e0;color:#e65100;}
+.b-low{background:#fce4ec;color:#c0392b;}
+.b-ok{background:#e8f5e9;color:#2a7a2a;}
+
+/* STOCK PROGRESS */
+.stock-bar-wrap{width:80px;height:7px;background:#f0efe8;border-radius:4px;overflow:hidden;display:inline-block;vertical-align:middle;}
+.stock-bar{height:100%;border-radius:4px;}
+
+/* UDHAAR */
+.udhaar-alert{background:#fff3e0;border:1px solid #ffcc80;border-radius:10px;padding:10px 14px;margin-bottom:1.1rem;font-size:13px;color:#e65100;font-weight:600;}
+
+/* NOTES */
+.notes-saved{font-size:12px;color:#2a7a2a;margin-left:8px;display:none;}
+
+/* CHART */
+.chart-card{background:#fff;border:1px solid #e0dfd7;border-radius:12px;padding:1.1rem;margin-bottom:1.1rem;}
+.chart-title{font-size:13px;font-weight:600;color:#666;margin-bottom:12px;}
+
+/* SEARCH */
+.search-row{display:flex;gap:7px;margin-bottom:.9rem;flex-wrap:wrap;}
+
+@media(max-width:600px){
+  .row{flex-direction:column;align-items:stretch;}
+  .row input,.row select,.row .btn{width:100%!important;}
+  .cur-date{min-width:unset;}
+}
+/* BILL MODAL */
+.bill-modal-bg{position:fixed;inset:0;z-index:8500;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;}
+.bill-modal-bg.open{display:flex;}
+.bill-modal-box{background:#fff;border-radius:16px;padding:0;width:480px;max-width:96vw;max-height:90vh;overflow-y:auto;box-shadow:0 12px 60px rgba(0,0,0,0.22);}
+body.dark .bill-modal-box{background:#1a1a1a;border:1px solid #2a2a2a;color:#e8e8e8;}
+.bill-header{background:#111;color:#fff;padding:1.2rem 1.5rem;border-radius:16px 16px 0 0;}
+.bill-header h2{font-size:17px;font-weight:700;margin:0;}
+.bill-header p{font-size:12px;opacity:0.7;margin:2px 0 0;}
+.bill-body{padding:1.3rem 1.5rem;}
+.bill-item-row{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap;}
+.bill-items-list{margin:10px 0;border:1px solid #e0dfd7;border-radius:8px;overflow:hidden;}
+body.dark .bill-items-list{border-color:#2a2a2a;}
+.bill-items-list table{width:100%;border-collapse:collapse;font-size:13px;}
+.bill-items-list thead th{background:#fafaf8;padding:7px 10px;text-align:left;font-size:11px;color:#999;font-weight:700;text-transform:uppercase;border-bottom:1px solid #e0dfd7;}
+body.dark .bill-items-list thead th{background:#111;border-color:#2a2a2a;color:#555;}
+.bill-items-list tbody td{padding:7px 10px;border-bottom:1px solid #f5f5f5;}
+body.dark .bill-items-list tbody td{border-color:#222;}
+.bill-items-list tbody tr:last-child td{border-bottom:none;}
+.bill-total-section{background:#f4f3ee;border-radius:8px;padding:10px 14px;margin-top:10px;}
+body.dark .bill-total-section{background:#111;}
+.bill-footer-btns{display:flex;gap:8px;padding:0 1.5rem 1.3rem;flex-wrap:wrap;}
+
+/* CUSTOMER BILL BTN in customer table */
+.btn-bill{background:#1565c0;color:#fff;}
+.btn-bill:hover{opacity:0.85;}
+
+@media print{
+  body{background:#fff;}
+  .tabs,.date-nav button,.card .row,.search-row,.header-btns,.shop-bar,.del-btn,.btn,.hbtn,
+  .bill-modal-bg,.modal-bg{display:none!important;}
+  #printBillArea{display:block!important;}
+}
+
+/* PRINT BILL AREA */
+#printBillArea{display:none;position:fixed;inset:0;background:#fff;z-index:99999;padding:30px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111;}
+#printBillArea .pb-shop{font-size:22px;font-weight:800;text-align:center;margin-bottom:2px;}
+#printBillArea .pb-sub{font-size:12px;color:#888;text-align:center;margin-bottom:14px;}
+#printBillArea .pb-divider{border:none;border-top:1px dashed #ccc;margin:10px 0;}
+#printBillArea .pb-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;}
+#printBillArea .pb-total{display:flex;justify-content:space-between;font-size:16px;font-weight:700;margin-top:10px;border-top:2px solid #111;padding-top:8px;}
+#printBillArea .pb-footer{text-align:center;font-size:12px;color:#999;margin-top:16px;}
+</style>
+</head>
+<body>
+
+<!-- PASSWORD OVERLAY -->
+<div id="lockScreen" style="
+  position:fixed;inset:0;z-index:9999;
+  background:#f4f3ee;
+  display:flex;align-items:center;justify-content:center;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+">
+  <div style="background:#fff;border:1px solid #e0dfd7;border-radius:16px;padding:2.2rem 2rem;width:320px;max-width:92vw;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+    <div style="font-size:36px;margin-bottom:10px;">🔒</div>
+    <h2 style="font-size:20px;font-weight:700;color:#111;margin-bottom:6px;">9/11 MINI MART</h2>
+    <p style="font-size:13px;color:#888;margin-bottom:1.4rem;">Password enter karein</p>
+    <input type="password" id="pwInput"
+      placeholder="Password"
+      style="width:100%;height:42px;padding:0 14px;border:1.5px solid #ddd;border-radius:9px;font-size:15px;font-family:inherit;outline:none;box-sizing:border-box;background:#fafaf8;color:#111;text-align:center;letter-spacing:2px;"
+      onkeydown="if(event.key==='Enter')checkPassword()"
+    />
+    <div id="pwError" style="color:#c0392b;font-size:12px;margin-top:8px;display:none;font-weight:600;">❌ Galat password!</div>
+    <button onclick="checkPassword()" style="
+      margin-top:14px;width:100%;height:42px;background:#111;color:#fff;
+      border:none;border-radius:9px;font-size:15px;font-weight:700;
+      cursor:pointer;font-family:inherit;
+    ">Unlock</button>
+  </div>
+</div>
+
+<script>
+// Password hash (SHA-256 of "mastertech5363")
+const PASS_HASH = "3c4d2b1a8f5e0927c6b3d4e1f2a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2";
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function checkPassword() {
+  const pw = document.getElementById('pwInput').value;
+  const hash = await sha256(pw);
+  // Store correct hash on first run
+  const stored = localStorage.getItem('ut_ph');
+  if (!stored) {
+    // First time: stored hash is the correct one we embed
+    const correctHash = await sha256('mastertech5363');
+    if (hash === correctHash) {
+      localStorage.setItem('ut_ph', correctHash);
+      unlock();
+    } else {
+      showError();
+    }
+  } else {
+    if (hash === stored) { unlock(); } else { showError(); }
+  }
+}
+
+function unlock() {
+  document.getElementById('lockScreen').style.display = 'none';
+  document.getElementById('pwInput').value = '';
+  document.getElementById('pwError').style.display = 'none';
+}
+function showError() {
+  const e = document.getElementById('pwError');
+  e.style.display = 'block';
+  const inp = document.getElementById('pwInput');
+  inp.style.borderColor = '#c0392b';
+  inp.value = '';
+  inp.focus();
+  setTimeout(()=>{ e.style.display='none'; inp.style.borderColor='#ddd'; }, 2500);
+}
+
+// Auto-focus password field
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(()=>document.getElementById('pwInput').focus(), 100);
+});
+</script>
+
+<div class="container">
+
+<!-- SHOP SWITCHER -->
+<div class="shop-bar" id="shopBar"></div>
+
+<!-- FIREBASE STATUS BAR -->
+<div style="display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #e0dfd7;border-radius:10px;padding:8px 14px;margin-bottom:1rem;flex-wrap:wrap;gap:8px;">
+  <span id="fbStatusBar" style="font-size:13px;font-weight:600;color:#888;">🔄 Firebase check ho raha hai...</span>
+  <button onclick="showFirebaseSetup()" style="height:28px;padding:0 12px;border-radius:8px;border:1px solid #ddd;background:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:#555;">⚙️ Firebase Setup</button>
+</div>
+
+<!-- FIREBASE SETUP MODAL -->
+<div id="fbSetupModal" style="position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;padding:2rem;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.2);">
+    <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;">🔥 Firebase Setup Guide</h3>
+    <p style="font-size:13px;color:#666;margin-bottom:1.2rem;">Yeh steps follow karein taaki aap aur aapka bhai dono online data share kar sakein (bilkul FREE):</p>
+    
+    <div style="background:#f4f3ee;border-radius:10px;padding:1rem;font-size:13px;line-height:1.8;margin-bottom:1rem;">
+      <b>Step 1:</b> <a href="https://console.firebase.google.com" target="_blank" style="color:#1565c0;">console.firebase.google.com</a> par jayein<br>
+      <b>Step 2:</b> "Add project" → project naam dein (jaise: 911minimart)<br>
+      <b>Step 3:</b> Build → <b>Realtime Database</b> → Create database → <b>Test mode</b><br>
+      <b>Step 4:</b> Project Settings (gear icon) → General → Your apps → Web (&lt;/&gt;) → Register app<br>
+      <b>Step 5:</b> <code style="background:#e8e8e8;padding:2px 6px;border-radius:4px;">firebaseConfig</code> copy karein aur yahan paste karein:
+    </div>
+    
+    <textarea id="fbConfigInput" placeholder='Yahan firebaseConfig ka JSON paste karein, jaise:
+{
+  "apiKey": "AIzaSy...",
+  "authDomain": "myapp.firebaseapp.com",
+  "databaseURL": "https://myapp-default-rtdb.firebaseio.com",
+  "projectId": "myapp",
+  "storageBucket": "myapp.appspot.com",
+  "messagingSenderId": "123456789",
+  "appId": "1:123456789:web:abc123"
+}' style="width:100%;height:180px;font-size:12px;padding:10px;border:1px solid #ddd;border-radius:8px;font-family:monospace;box-sizing:border-box;resize:vertical;"></textarea>
+    
+    <div id="fbConfigMsg" style="font-size:13px;font-weight:600;margin-top:8px;display:none;"></div>
+    
+    <div style="display:flex;gap:8px;margin-top:1rem;">
+      <button onclick="saveFbConfig()" style="flex:1;height:40px;background:#111;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">✓ Save & Connect</button>
+      <button onclick="document.getElementById('fbSetupModal').style.display='none'" style="flex:1;height:40px;background:#f0efe8;color:#333;border:1px solid #ddd;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Cancel</button>
+    </div>
+    
+    <p style="font-size:11px;color:#aaa;margin-top:12px;text-align:center;">Config sirf aapke browser mein save hogi. Dono bhai apne apne browser mein yeh ek baar karo.</p>
+  </div>
+</div>
+
+<script>
+function showFirebaseSetup() {
+  document.getElementById('fbSetupModal').style.display = 'flex';
+  const saved = localStorage.getItem('ut_fb_config');
+  if (saved) document.getElementById('fbConfigInput').value = saved;
+}
+
+function saveFbConfig() {
+  const raw = document.getElementById('fbConfigInput').value.trim();
+  const msg = document.getElementById('fbConfigMsg');
+  try {
+    // Clean up: remove "const firebaseConfig = " if user pasted that
+    let json = raw.replace(/^const\s+\w+\s*=\s*/, '').replace(/;$/, '').trim();
+    const cfg = JSON.parse(json);
+    if (!cfg.databaseURL) { msg.textContent = '❌ databaseURL nahi mili. Pura config paste karein.'; msg.style.color='#c0392b'; msg.style.display='block'; return; }
+    localStorage.setItem('ut_fb_config', JSON.stringify(cfg));
+    msg.textContent = '✅ Config save ho gayi! Page reload ho raha hai...'; msg.style.color='#2a7a2a'; msg.style.display='block';
+    setTimeout(() => location.reload(), 1500);
+  } catch(e) {
+    msg.textContent = '❌ Invalid JSON. Firebase console se dobara copy karein.'; msg.style.color='#c0392b'; msg.style.display='block';
+  }
+}
+</script>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <h1 id="shopTitle">🛒 9/11 MINI MART</h1>
+    <p>Sales · Expenses · Udhaar · Stock · Customers</p>
+  </div>
+  <div class="header-btns">
+    <button class="hbtn hbtn-outline" id="darkToggleBtn" onclick="toggleDark()">🌙 Dark</button>
+    <button class="hbtn hbtn-outline" onclick="openChangePw()">🔑 Password</button>
+    <button class="hbtn hbtn-outline" onclick="window.print()">🖨️ Print</button>
+    <button class="hbtn hbtn-outline" onclick="exportCSV()">⬇️ CSV</button>
+    <button class="hbtn hbtn-dark" onclick="exportJSON()">💾 Backup</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('sales',this)">📦 Sales</button>
+  <button class="tab" onclick="switchTab('expenses',this)">💸 Expenses</button>
+  <button class="tab" onclick="switchTab('udhaar',this)">🤝 Udhaar</button>
+  <button class="tab" onclick="switchTab('stock',this)">📋 Stock</button>
+  <button class="tab" onclick="switchTab('customers',this)">👥 Customers</button>
+  <button class="tab" onclick="switchTab('cash',this)">💰 Cash</button>
+  <button class="tab" onclick="switchTab('report',this)">📊 Report</button>
+</div>
+
+<!-- SALES -->
+<div class="panel active" id="panel-sales">
+  <div class="date-nav">
+    <button onclick="changeDay(-1)">← Prev</button>
+    <span class="cur-date" id="dateLabel">-</span>
+    <button onclick="changeDay(1)">Next →</button>
+    <button class="today-btn" onclick="goToday()">Today</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Add sale</div>
+    <div class="row">
+      <input type="text" id="sName" placeholder="Product name" style="width:180px"/>
+      <select id="sCat" style="width:130px">
+        <option>Food</option><option>Drinks</option><option>Snacks</option><option>Household</option><option>Other</option>
+      </select>
+      <input type="number" id="sAmt" placeholder="Price (Rs)" style="width:120px" min="0"/>
+      <input type="number" id="sQty" placeholder="Qty" style="width:70px" min="1" value="1"/>
+      <select id="sCust" style="width:140px"><option value="">-- Customer (opt) --</option></select>
+      <button class="btn btn-black" onclick="addSale()">+ Add</button>
+    </div>
+  </div>
+  <div class="card" style="padding:11px 14px;">
+    <label style="font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:7px;">📝 Day notes</label>
+    <textarea id="dayNotes" placeholder="Aaj ki khaas baat..." style="width:100%;"></textarea>
+    <button class="btn btn-black" style="height:31px;font-size:13px;margin-top:7px;" onclick="saveNotes()">Save</button>
+    <span class="notes-saved" id="notesSaved">✓ Saved!</span>
+  </div>
+  <div class="search-row">
+    <input type="text" id="sSearch" placeholder="🔍 Search..." oninput="renderSales()" style="width:180px"/>
+    <select id="sFilt" onchange="renderSales()" style="width:130px">
+      <option value="">All categories</option>
+      <option>Food</option><option>Drinks</option><option>Snacks</option><option>Household</option><option>Other</option>
+    </select>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">Today sales</div><div class="metric-value" id="mDaySale">Rs 0</div></div>
+    <div class="metric"><div class="metric-label">Today expense</div><div class="metric-value red" id="mDayExp">Rs 0</div></div>
+    <div class="metric"><div class="metric-label">Today profit</div><div class="metric-value green" id="mDayProfit">Rs 0</div></div>
+    <div class="metric"><div class="metric-label">Items sold</div><div class="metric-value" id="mDayCount">0</div></div>
+  </div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Product</th><th>Cat</th><th>Customer</th><th>Qty</th><th>Price</th><th>Total</th><th></th></tr></thead>
+    <tbody id="salesBody"></tbody></table>
+  </div>
+</div>
+
+<!-- EXPENSES -->
+<div class="panel" id="panel-expenses">
+  <div class="date-nav">
+    <button onclick="changeDay(-1)">← Prev</button>
+    <span class="cur-date" id="dateLabelExp">-</span>
+    <button onclick="changeDay(1)">Next →</button>
+    <button class="today-btn" onclick="goToday()">Today</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Add expense</div>
+    <div class="row">
+      <input type="text" id="eName" placeholder="Expense name" style="width:200px"/>
+      <input type="number" id="eAmt" placeholder="Amount (Rs)" style="width:130px" min="0"/>
+      <button class="btn btn-red" onclick="addExpense()">+ Add</button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Expense</th><th>Amount</th><th></th></tr></thead>
+    <tbody id="expBody"></tbody></table>
+  </div>
+  <div style="background:#fff;border:1px solid #e0dfd7;border-radius:10px;padding:12px 14px;font-size:15px;font-weight:700;color:#c0392b;">
+    Total expenses: <span id="expTotalLabel">Rs 0</span>
+  </div>
+</div>
+
+<!-- UDHAAR -->
+<div class="panel" id="panel-udhaar">
+  <div id="udhaarAlert" class="udhaar-alert" style="display:none;"></div>
+  <div class="card">
+    <div class="card-title">Add udhaar</div>
+    <div class="row">
+      <input type="text" id="uName" placeholder="Customer name" style="width:160px"/>
+      <input type="tel" id="uPhone" placeholder="Phone (WhatsApp)" style="width:150px"/>
+      <input type="number" id="uAmt" placeholder="Amount (Rs)" style="width:120px" min="0"/>
+      <input type="text" id="uNote" placeholder="Note (e.g. Doodh)" style="width:150px"/>
+      <button class="btn btn-black" onclick="addUdhaar()">+ Add</button>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">Total udhaar</div><div class="metric-value red" id="mUdhaarTotal">Rs 0</div></div>
+    <div class="metric"><div class="metric-label">Unpaid</div><div class="metric-value red" id="mUdhaarUnpaid">Rs 0</div></div>
+    <div class="metric"><div class="metric-label">Recovered</div><div class="metric-value green" id="mUdhaarPaid">Rs 0</div></div>
+    <div class="metric"><div class="metric-label">Customers</div><div class="metric-value orange" id="mUdhaarCount">0</div></div>
+  </div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Customer</th><th>Phone</th><th>Amount</th><th>Note</th><th>Date</th><th>Status</th><th>Action</th><th></th></tr></thead>
+    <tbody id="udhaarBody"></tbody></table>
+  </div>
+</div>
+
+<!-- STOCK -->
+<div class="panel" id="panel-stock">
+  <div class="card">
+    <div class="card-title">Add / update stock item</div>
+    <div class="row">
+      <input type="text" id="stName" placeholder="Item name" style="width:170px"/>
+      <input type="number" id="stQty" placeholder="Current qty" style="width:110px" min="0"/>
+      <input type="number" id="stMin" placeholder="Min level" style="width:100px" min="0"/>
+      <input type="text" id="stUnit" placeholder="Unit (kg/pcs)" style="width:90px"/>
+      <input type="number" id="stPrice" placeholder="Buy price" style="width:110px" min="0"/>
+      <button class="btn btn-black" onclick="addStock()">+ Save</button>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">Total items</div><div class="metric-value" id="mStockCount">0</div></div>
+    <div class="metric"><div class="metric-label">Low stock</div><div class="metric-value red" id="mLowStock">0</div></div>
+    <div class="metric"><div class="metric-label">Stock value</div><div class="metric-value green" id="mStockVal">Rs 0</div></div>
+  </div>
+  <div class="search-row">
+    <input type="text" id="stSearch" placeholder="🔍 Search item..." oninput="renderStock()" style="width:200px"/>
+  </div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Item</th><th>Qty</th><th>Unit</th><th>Min Level</th><th>Buy Price</th><th>Value</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody id="stockBody"></tbody></table>
+  </div>
+</div>
+
+<!-- CUSTOMERS -->
+<div class="panel" id="panel-customers">
+  <div class="card">
+    <div class="card-title">Add customer</div>
+    <div class="row">
+      <input type="text" id="cName" placeholder="Customer name" style="width:170px"/>
+      <input type="tel" id="cPhone" placeholder="Phone / WhatsApp" style="width:150px"/>
+      <input type="text" id="cAddress" placeholder="Address (opt)" style="width:170px"/>
+      <button class="btn btn-black" onclick="addCustomer()">+ Add</button>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">Total customers</div><div class="metric-value" id="mCustCount">0</div></div>
+    <div class="metric"><div class="metric-label">With udhaar</div><div class="metric-value red" id="mCustUdhaar">0</div></div>
+  </div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Name</th><th>Phone</th><th>Address</th><th>Total bought</th><th>Udhaar</th><th>Action</th><th></th></tr></thead>
+    <tbody id="custBody"></tbody></table>
+  </div>
+</div>
+
+<!-- CASH DRAWER -->
+<div class="panel" id="panel-cash">
+  <div class="date-nav">
+    <button onclick="changeDay(-1)">← Prev</button>
+    <span class="cur-date" id="dateLabelCash">-</span>
+    <button onclick="changeDay(1)">Next →</button>
+    <button class="today-btn" onclick="goToday()">Today</button>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">Opening Balance</div><div class="metric-value green" id="mCashOpen">Rs 0</div></div>
+    <div class="metric"><div class="metric-label">Today Sales</div><div class="metric-value" id="mCashSales">Rs 0</div></div>
+    <div class="metric"><div class="metric-label">Today Expenses</div><div class="metric-value red" id="mCashExp">Rs 0</div></div>
+    <div class="metric"><div class="metric-label">Cash In Hand</div><div class="metric-value green" id="mCashHand">Rs 0</div></div>
+    <div class="metric"><div class="metric-label">Closing Balance</div><div class="metric-value orange" id="mCashClose">Rs 0</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">💰 Opening Balance Set Karein</div>
+    <div class="row">
+      <input type="number" id="cashOpenAmt" placeholder="Opening cash (Rs)" style="width:180px;" min="0"/>
+      <button class="btn btn-black" onclick="saveCashOpen()">✓ Save</button>
+      <span id="cashOpenSaved" style="font-size:12px;color:#2a7a2a;display:none;">✓ Saved!</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">📝 Cash Notes / Denomination</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:10px;" id="denomGrid">
+      <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;font-weight:600;width:50px;">Rs 5000</span><input type="number" class="denom-inp" data-val="5000" placeholder="0" min="0" style="width:70px;height:33px;font-size:13px;" oninput="calcDenom()"/></div>
+      <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;font-weight:600;width:50px;">Rs 1000</span><input type="number" class="denom-inp" data-val="1000" placeholder="0" min="0" style="width:70px;height:33px;font-size:13px;" oninput="calcDenom()"/></div>
+      <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;font-weight:600;width:50px;">Rs 500</span><input type="number" class="denom-inp" data-val="500" placeholder="0" min="0" style="width:70px;height:33px;font-size:13px;" oninput="calcDenom()"/></div>
+      <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;font-weight:600;width:50px;">Rs 100</span><input type="number" class="denom-inp" data-val="100" placeholder="0" min="0" style="width:70px;height:33px;font-size:13px;" oninput="calcDenom()"/></div>
+      <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;font-weight:600;width:50px;">Rs 50</span><input type="number" class="denom-inp" data-val="50" placeholder="0" min="0" style="width:70px;height:33px;font-size:13px;" oninput="calcDenom()"/></div>
+      <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;font-weight:600;width:50px;">Rs 20</span><input type="number" class="denom-inp" data-val="20" placeholder="0" min="0" style="width:70px;height:33px;font-size:13px;" oninput="calcDenom()"/></div>
+      <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;font-weight:600;width:50px;">Rs 10</span><input type="number" class="denom-inp" data-val="10" placeholder="0" min="0" style="width:70px;height:33px;font-size:13px;" oninput="calcDenom()"/></div>
+    </div>
+    <div style="font-size:15px;font-weight:700;color:#111;">Denom Total: <span id="denomTotal">Rs 0</span></div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Description</th><th>Amount</th></tr></thead>
+      <tbody id="cashSummaryBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- REPORT -->
+<div class="panel" id="panel-report">
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">Week sales</div><div class="metric-value" id="mWeekSale">Rs 0</div></div>
+    <div class="metric"><div class="metric-label">Week expense</div><div class="metric-value red" id="mWeekExp">Rs 0</div></div>
+    <div class="metric"><div class="metric-label">Week profit</div><div class="metric-value green" id="mWeekProfit">Rs 0</div></div>
+    <div class="metric"><div class="metric-label">Month sales</div><div class="metric-value green" id="mMonthSale">Rs 0</div></div>
+    <div class="metric"><div class="metric-label">Month profit</div><div class="metric-value green" id="mMonthProfit">Rs 0</div></div>
+    <div class="metric"><div class="metric-label">Udhaar pending</div><div class="metric-value red" id="mRepUdhaar">Rs 0</div></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Last 7 days — Sales vs Expenses</div>
+    <div style="position:relative;width:100%;height:210px;"><canvas id="chartWeek" role="img" aria-label="Sales vs expenses last 7 days"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Category breakdown (this month)</div>
+    <div style="position:relative;width:100%;height:210px;"><canvas id="chartCat" role="img" aria-label="Category sales this month"></canvas></div>
+  </div>
+</div>
+
+</div><!-- end container -->
+
+<!-- BILL MODAL -->
+<div class="bill-modal-bg" id="billModal">
+  <div class="bill-modal-box">
+    <div class="bill-header">
+      <h2>🧾 Customer Bill</h2>
+      <p id="billModalSubtitle">Items add karein aur bill print karein</p>
+    </div>
+    <div class="bill-body">
+      <div style="margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Customer</div>
+        <div id="billCustInfo" style="font-size:15px;font-weight:700;color:#111;"></div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Item Add Karein</div>
+      <div class="bill-item-row">
+        <input type="text" id="billItemName" placeholder="Item naam" style="width:160px;height:35px;font-size:13px;"/>
+        <input type="number" id="billItemQty" placeholder="Qty" style="width:65px;height:35px;font-size:13px;" min="1" value="1"/>
+        <input type="number" id="billItemPrice" placeholder="Price (Rs)" style="width:110px;height:35px;font-size:13px;" min="0"/>
+        <button class="btn btn-black" style="height:35px;font-size:13px;padding:0 12px;" onclick="addBillItem()">+ Add</button>
+      </div>
+      <div class="bill-items-list" id="billItemsList">
+        <table>
+          <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th></th></tr></thead>
+          <tbody id="billItemsBody"><tr><td colspan="5" class="empty" style="text-align:center;padding:1rem;color:#bbb;font-size:13px;">Koi item nahi</td></tr></tbody>
+        </table>
+      </div>
+      <div class="bill-total-section">
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:#888;margin-bottom:5px;">
+          <span>Total Items:</span><span id="billTotalItems">0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:700;color:#111;">
+          <span>Grand Total:</span><span id="billGrandTotal">Rs 0</span>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <label style="font-size:12px;font-weight:600;color:#888;display:block;margin-bottom:5px;">Note (optional)</label>
+        <input type="text" id="billNote" placeholder="e.g. Advance paid, Discount..." style="width:100%;height:35px;font-size:13px;"/>
+      </div>
+    </div>
+    <div class="bill-footer-btns">
+      <button class="btn btn-black" style="flex:1;" onclick="printCustomerBill()">🖨️ Print Bill</button>
+      <button class="btn btn-green" style="flex:1;" onclick="saveBillAsSale()">💾 Save as Sale</button>
+      <button class="btn" style="background:#e0dfd7;color:#333;flex:0 0 80px;" onclick="closeBillModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRINT BILL AREA -->
+<div id="printBillArea"></div>
+
+<!-- CUSTOMER HISTORY MODAL -->
+<div class="bill-modal-bg" id="historyModal">
+  <div class="bill-modal-box" style="width:560px;">
+    <div class="bill-header" style="background:#6a1b9a;">
+      <h2>📅 Purchase History</h2>
+      <p id="historyModalSubtitle">Customer ki puri khareedari</p>
+    </div>
+    <div class="bill-body">
+      <div id="historyContent" style="max-height:420px;overflow-y:auto;"></div>
+    </div>
+    <div class="bill-footer-btns">
+      <button class="btn btn-black" style="flex:1;" onclick="closeHistoryModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- PASSWORD CHANGE MODAL -->
+<div class="modal-bg" id="changePwModal">
+  <div class="modal-box">
+    <h3 style="font-size:18px;font-weight:700;margin-bottom:6px;">🔑 Password Badlein</h3>
+    <p style="font-size:13px;color:#888;margin-bottom:1.3rem;">Purana aur naya password dono darj karein</p>
+    <label style="font-size:12px;font-weight:600;color:#888;display:block;margin-bottom:4px;">Purana Password</label>
+    <input type="password" id="cpOld" placeholder="Current password" style="width:100%;height:39px;padding:0 12px;border:1.5px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;outline:none;margin-bottom:10px;box-sizing:border-box;" />
+    <label style="font-size:12px;font-weight:600;color:#888;display:block;margin-bottom:4px;">Naya Password</label>
+    <input type="password" id="cpNew" placeholder="New password" style="width:100%;height:39px;padding:0 12px;border:1.5px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;outline:none;margin-bottom:10px;box-sizing:border-box;" />
+    <label style="font-size:12px;font-weight:600;color:#888;display:block;margin-bottom:4px;">Naya Password Dobara</label>
+    <input type="password" id="cpNew2" placeholder="Confirm new password" style="width:100%;height:39px;padding:0 12px;border:1.5px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;outline:none;margin-bottom:14px;box-sizing:border-box;" />
+    <div id="cpMsg" style="font-size:13px;font-weight:600;margin-bottom:10px;display:none;"></div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="doChangePw()" style="flex:1;height:40px;background:#111;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Save</button>
+      <button onclick="closeChangePw()" style="flex:1;height:40px;background:#f0efe8;color:#333;border:1px solid #ddd;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+// ══════════════════════════════════════════════════════════
+//  🔥 FIREBASE CONFIG — localStorage se load hoti hai
+//  Pehli dafa "Firebase Setup" button dabayein
+// ══════════════════════════════════════════════════════════
+let FIREBASE_CONFIG = {};
+try {
+  const saved = localStorage.getItem('ut_fb_config');
+  if (saved) FIREBASE_CONFIG = JSON.parse(saved);
+} catch(e) {}
+
+// ── Firebase setup ────────────────────────────────────────
+let fbApp = null, fbDb = null, fbConnected = false;
+
+function initFirebase() {
+  try {
+    if (!FIREBASE_CONFIG.databaseURL) {
+      showFbStatus('⚠️ Firebase config nahi hai — sirf local save ho raha hai', 'orange');
+      return;
+    }
+    fbApp = initializeApp(FIREBASE_CONFIG);
+    fbDb = getDatabase(fbApp);
+    fbConnected = true;
+    showFbStatus('🔄 Firebase se connect ho raha hai...', '#888');
+
+    // Listen for remote changes (real-time sync)
+    const shopDataRef = ref(fbDb, 'shopData');
+    onValue(shopDataRef, (snapshot) => {
+      const remoteData = snapshot.val();
+      if (remoteData) {
+        // Merge remote data into local D
+        Object.keys(remoteData).forEach(shopId => {
+          D[shopId] = remoteData[shopId];
+          // Also update localStorage as cache
+          ls('ut_d_' + shopId, D[shopId]);
+        });
+        if (remoteData._shops) {
+          shops = remoteData._shops;
+          ls('ut_shops', shops);
+          renderShopBar();
+          const curShop = shops.find(s => s.id === curShopId) || shops[0];
+          document.getElementById('shopTitle').textContent = '🛒 ' + curShop.name;
+        }
+        render();
+        showFbStatus('✅ Online — Real-time sync chal raha hai', '#2a7a2a');
+      } else {
+        showFbStatus('✅ Firebase connected — Pehli dafa data upload ho raha hai', '#2a7a2a');
+        // First time: push local data to Firebase
+        pushToFirebase();
+      }
+    });
+  } catch (e) {
+    console.error('Firebase error:', e);
+    showFbStatus('❌ Firebase error: ' + e.message, '#c0392b');
+  }
+}
+
+// Push all data to Firebase
+window.pushToFirebase = function() {
+  if (!fbDb) return;
+  const payload = { _shops: shops };
+  shops.forEach(s => {
+    if (D[s.id]) payload[s.id] = D[s.id];
+  });
+  set(ref(fbDb, 'shopData'), payload)
+    .then(() => showFbStatus('☁️ Cloud mein save ho gaya', '#2a7a2a'))
+    .catch(e => showFbStatus('❌ Save failed: ' + e.message, '#c0392b'));
+};
+
+function showFbStatus(msg, color) {
+  const el = document.getElementById('fbStatusBar');
+  if (el) { el.textContent = msg; el.style.color = color; }
+}
+
+// Override saveAll to also push to Firebase
+const _origSaveAll = window._origSaveAll;
+window._firebaseSaveAll = function() {
+  // Call original saveAll (localStorage)
+  ls('ut_shops', shops);
+  ls('ut_curShop', curShopId);
+  ls('ut_d_' + curShopId, D[curShopId]);
+  // Push to Firebase
+  if (fbConnected) pushToFirebase();
+};
+
+// Wait for DOM + main script, then init
+window.addEventListener('load', () => {
+  setTimeout(initFirebase, 500);
+  // Patch saveAll
+  const origSaveAll = window.saveAll;
+  if (origSaveAll) {
+    window.saveAll = function() {
+      origSaveAll();
+      if (fbConnected) pushToFirebase();
+    };
+  }
+});
+</script>
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let shops = [];       // [{id, name}]
+let curShopId = null;
+let D = {};           // per-shop data: D[shopId] = {sales:{}, expenses:{}, udhaar:[], stock:[], customers:[], notes:{}}
+let currentDate = new Date(); currentDate.setHours(0,0,0,0);
+let chartW = null, chartC = null;
+
+// ─── PERSISTENCE ─────────────────────────────────────────────────────────────
+function ls(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k));localStorage.setItem(k,JSON.stringify(v));}catch(e){return null;}}
+function loadAll(){
+  shops = ls('ut_shops') || [{id:'s1',name:'9/11 MINI MART'}];
+  curShopId = ls('ut_curShop') || shops[0].id;
+  shops.forEach(s=>{ if(!D[s.id]) D[s.id]=ls('ut_d_'+s.id)||emptyShop(); });
+}
+function saveAll(){
+  ls('ut_shops',shops);
+  ls('ut_curShop',curShopId);
+  ls('ut_d_'+curShopId, D[curShopId]);
+}
+function emptyShop(){return{sales:{},expenses:{},udhaar:[],stock:[],customers:[],notes:{},cash:{}};}
+function sd(){return D[curShopId];}
+
+// ─── SHOP MANAGEMENT ─────────────────────────────────────────────────────────
+function renderShopBar(){
+  const bar=document.getElementById('shopBar');
+  bar.innerHTML='';
+  shops.forEach(s=>{
+    const btn=document.createElement('button');
+    btn.className='shop-btn'+(s.id===curShopId?' active':'');
+    btn.onclick=()=>switchShop(s.id);
+    btn.innerHTML=`🏪 ${s.name}`;
+    if(shops.length>1){
+      const d=document.createElement('span');
+      d.className='del-shop'; d.textContent='✕';
+      d.onclick=(e)=>{e.stopPropagation();deleteShop(s.id);};
+      btn.appendChild(d);
+    }
+    bar.appendChild(btn);
+  });
+  const nb=document.createElement('button');
+  nb.className='btn-new-shop'; nb.textContent='+ New Shop';
+  nb.onclick=()=>{
+    const n=prompt('Shop ka naam:');
+    if(n&&n.trim()){const id='s'+Date.now();shops.push({id,name:n.trim()});D[id]=emptyShop();switchShop(id);}
+  };
+  bar.appendChild(nb);
+}
+function switchShop(id){
+  curShopId=id; saveAll(); renderShopBar();
+  document.getElementById('shopTitle').textContent='🛒 '+shops.find(s=>s.id===id).name;
+  render();
+}
+function deleteShop(id){
+  if(!confirm('Yeh shop delete ho jayegi?'))return;
+  shops=shops.filter(s=>s.id!==id);
+  delete D[id]; localStorage.removeItem('ut_d_'+id);
+  curShopId=shops[0].id; saveAll(); renderShopBar(); render();
+}
+
+// ─── DATE ─────────────────────────────────────────────────────────────────────
+function dk(d){return d.toISOString().split('T')[0];}
+function fmtDate(d){return d.toLocaleDateString('en-PK',{weekday:'long',day:'numeric',month:'long',year:'numeric'});}
+function changeDay(n){currentDate=new Date(currentDate);currentDate.setDate(currentDate.getDate()+n);render();}
+function goToday(){currentDate=new Date();currentDate.setHours(0,0,0,0);render();}
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+function switchTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-'+name).classList.add('active');
+  render();
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+function val(id){const e=document.getElementById(id);return e?e.value:'';}
+function clr(...ids){ids.forEach(id=>{const e=document.getElementById(id);if(e)e.value='';})}
+function catBadge(c){const m={Food:'b-food',Drinks:'b-drinks',Snacks:'b-snacks',Household:'b-household',Other:'b-other'};return`<span class="badge ${m[c]||'b-other'}">${c}</span>`;}
+function getDaySales(key){return(sd().sales[key]||[]).reduce((s,e)=>s+e.amt*e.qty,0);}
+function getDayExp(key){return(sd().expenses[key]||[]).reduce((s,e)=>s+e.amt,0);}
+
+// ─── SALES ────────────────────────────────────────────────────────────────────
+function addSale(){
+  const name=val('sName').trim(),cat=val('sCat'),amt=parseFloat(val('sAmt')),qty=parseInt(val('sQty'))||1,cust=val('sCust');
+  if(!name||isNaN(amt)||amt<0){document.getElementById('sName').focus();return;}
+  const key=dk(currentDate);
+  if(!sd().sales[key])sd().sales[key]=[];
+  sd().sales[key].push({id:Date.now(),name,cat,amt,qty,cust});
+  // update customer total
+  if(cust){const c=sd().customers.find(x=>x.id==cust);if(c){c.total=(c.total||0)+amt*qty;}}
+  saveAll(); clr('sName','sAmt'); document.getElementById('sQty').value='1'; document.getElementById('sName').focus();
+  renderSales();
+}
+function delSale(key,id){sd().sales[key]=(sd().sales[key]||[]).filter(e=>e.id!==id);saveAll();renderSales();}
+
+function renderSales(){
+  const key=dk(currentDate);
+  document.querySelectorAll('.cur-date').forEach(el=>el.textContent=fmtDate(currentDate));
+  const nt=document.getElementById('dayNotes');if(nt)nt.value=sd().notes[key]||'';
+  const search=val('sSearch').toLowerCase(),filt=val('sFilt');
+  const entries=(sd().sales[key]||[]).filter(e=>(!search||e.name.toLowerCase().includes(search))&&(!filt||e.cat===filt));
+  const tb=document.getElementById('salesBody');if(!tb)return;
+  tb.innerHTML='';
+  if(!entries.length){tb.innerHTML='<tr><td colspan="7" class="empty">Koi sale nahi. Upar add karein.</td></tr>';return;}
+  entries.forEach(e=>{
+    const cName=e.cust?(sd().customers.find(c=>c.id==e.cust)||{}).name||'':'-';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${e.name}</td><td>${catBadge(e.cat)}</td><td>${cName||'-'}</td><td>${e.qty}</td><td>Rs ${e.amt.toLocaleString()}</td><td style="font-weight:700;">Rs ${(e.amt*e.qty).toLocaleString()}</td><td><button class="del-btn" onclick="delSale('${key}',${e.id})">✕</button></td>`;
+    tb.appendChild(tr);
+  });
+  const tot=(sd().sales[key]||[]).reduce((s,e)=>s+e.amt*e.qty,0);
+  const tr=document.createElement('tr');tr.className='total-row';
+  tr.innerHTML=`<td colspan="5" style="padding:9px 11px;font-size:13px;color:#555;">Day Total</td><td style="padding:9px 11px;font-size:15px;">Rs ${tot.toLocaleString()}</td><td></td>`;
+  tb.appendChild(tr);
+  updateCustDropdown();
+  // metrics
+  const expT=getDayExp(key);const saleT=getDaySales(key);
+  set('mDaySale','Rs '+saleT.toLocaleString());
+  set('mDayExp','Rs '+expT.toLocaleString());
+  set('mDayProfit','Rs '+(saleT-expT).toLocaleString());
+  set('mDayCount',(sd().sales[key]||[]).reduce((s,e)=>s+e.qty,0));
+}
+function saveNotes(){const key=dk(currentDate);sd().notes[key]=val('dayNotes');saveAll();const el=document.getElementById('notesSaved');if(el){el.style.display='inline';setTimeout(()=>el.style.display='none',2000);}}
+
+// ─── EXPENSES ─────────────────────────────────────────────────────────────────
+function addExpense(){
+  const name=val('eName').trim(),amt=parseFloat(val('eAmt'));
+  if(!name||isNaN(amt))return;
+  const key=dk(currentDate);
+  if(!sd().expenses[key])sd().expenses[key]=[];
+  sd().expenses[key].push({id:Date.now(),name,amt});
+  saveAll();clr('eName','eAmt');renderExpenses();
+}
+function delExpense(key,id){sd().expenses[key]=(sd().expenses[key]||[]).filter(e=>e.id!==id);saveAll();renderExpenses();}
+function renderExpenses(){
+  const key=dk(currentDate);
+  const entries=sd().expenses[key]||[];
+  const tb=document.getElementById('expBody');if(!tb)return;
+  tb.innerHTML='';
+  if(!entries.length){tb.innerHTML='<tr><td colspan="3" class="empty">Koi expense nahi.</td></tr>';}
+  else{
+    entries.forEach(e=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${e.name}</td><td style="font-weight:700;color:#c0392b;">Rs ${e.amt.toLocaleString()}</td><td><button class="del-btn" onclick="delExpense('${key}',${e.id})">✕</button></td>`;
+      tb.appendChild(tr);
+    });
+  }
+  const tot=entries.reduce((s,e)=>s+e.amt,0);
+  set('expTotalLabel','Rs '+tot.toLocaleString());
+  set('mDayExp','Rs '+tot.toLocaleString());
+}
+
+// ─── UDHAAR ───────────────────────────────────────────────────────────────────
+function addUdhaar(){
+  const name=val('uName').trim(),phone=val('uPhone').trim(),amt=parseFloat(val('uAmt')),note=val('uNote').trim();
+  if(!name||isNaN(amt))return;
+  sd().udhaar.push({id:Date.now(),name,phone,amt,note,date:dk(currentDate),paid:0});
+  saveAll();clr('uName','uPhone','uAmt','uNote');renderUdhaar();
+}
+function markPaid(id,partial){
+  const u=sd().udhaar.find(x=>x.id===id);if(!u)return;
+  if(partial){const p=parseFloat(prompt('Kitna mila? (Rs)'));if(isNaN(p)||p<=0)return;u.paid=Math.min((u.paid||0)+p,u.amt);}
+  else{u.paid=u.amt;}
+  saveAll();renderUdhaar();
+}
+function delUdhaar(id){sd().udhaar=sd().udhaar.filter(x=>x.id!==id);saveAll();renderUdhaar();}
+function waReminder(name,phone,amt){
+  const msg=encodeURIComponent(`Assalam o Alaikum ${name} bhai! Aap par Rs ${amt.toLocaleString()} ki raqam baqi hai. Meherbani kar ke ada kar dein. Shukriya!`);
+  window.open(`https://wa.me/92${phone.replace(/^0/,'')}?text=${msg}`,'_blank');
+}
+function renderUdhaar(){
+  const list=sd().udhaar;
+  const tb=document.getElementById('udhaarBody');if(!tb)return;
+  tb.innerHTML='';
+  const totalAmt=list.reduce((s,u)=>s+u.amt,0);
+  const paidAmt=list.reduce((s,u)=>s+(u.paid||0),0);
+  const unpaid=totalAmt-paidAmt;
+  set('mUdhaarTotal','Rs '+totalAmt.toLocaleString());
+  set('mUdhaarUnpaid','Rs '+unpaid.toLocaleString());
+  set('mUdhaarPaid','Rs '+paidAmt.toLocaleString());
+  set('mUdhaarCount',new Set(list.map(u=>u.name)).size);
+  set('mRepUdhaar','Rs '+unpaid.toLocaleString());
+  const al=document.getElementById('udhaarAlert');
+  const overdue=list.filter(u=>(u.paid||0)<u.amt);
+  if(al){if(overdue.length){al.style.display='block';al.textContent=`⚠️ ${overdue.length} log(on) par total Rs ${overdue.reduce((s,u)=>s+(u.amt-(u.paid||0)),0).toLocaleString()} baqi hai!`;}else al.style.display='none';}
+  if(!list.length){tb.innerHTML='<tr><td colspan="8" class="empty">Koi udhaar nahi. 🎉</td></tr>';return;}
+  list.forEach(u=>{
+    const remaining=u.amt-(u.paid||0);
+    const status=remaining<=0?'<span class="badge b-paid">Paid</span>':u.paid>0?'<span class="badge b-partial">Partial</span>':'<span class="badge b-unpaid">Unpaid</span>';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="font-weight:600;">${u.name}</td>
+      <td>${u.phone||'-'}</td>
+      <td>Rs ${u.amt.toLocaleString()}<br><small style="color:#999;">Baqi: Rs ${remaining.toLocaleString()}</small></td>
+      <td>${u.note||'-'}</td>
+      <td style="font-size:12px;color:#888;">${u.date}</td>
+      <td>${status}</td>
+      <td style="display:flex;gap:5px;flex-wrap:wrap;padding:6px 0;">
+        ${remaining>0?`<button class="btn btn-green" style="height:28px;font-size:12px;padding:0 8px;" onclick="markPaid(${u.id},false)">Paid</button>
+        <button class="btn btn-black" style="height:28px;font-size:12px;padding:0 8px;" onclick="markPaid(${u.id},true)">Partial</button>`:''}
+        ${u.phone?`<button class="btn btn-wa" style="height:28px;font-size:12px;padding:0 8px;" onclick="waReminder('${u.name}','${u.phone}',${remaining})">WhatsApp</button>`:''}
+      </td>
+      <td><button class="del-btn" onclick="delUdhaar(${u.id})">✕</button></td>`;
+    tb.appendChild(tr);
+  });
+}
+
+// ─── STOCK ────────────────────────────────────────────────────────────────────
+function addStock(){
+  const name=val('stName').trim(),qty=parseFloat(val('stQty')),min=parseFloat(val('stMin'))||0,unit=val('stUnit').trim()||'pcs',price=parseFloat(val('stPrice'))||0;
+  if(!name||isNaN(qty))return;
+  const ex=sd().stock.find(s=>s.name.toLowerCase()===name.toLowerCase());
+  if(ex){ex.qty=qty;ex.min=min;ex.unit=unit;ex.price=price;}
+  else{sd().stock.push({id:Date.now(),name,qty,min,unit,price});}
+  saveAll();clr('stName','stQty','stMin','stUnit','stPrice');renderStock();
+}
+function updateStockQty(id,delta){
+  const s=sd().stock.find(x=>x.id===id);if(!s)return;
+  s.qty=Math.max(0,s.qty+delta);saveAll();renderStock();
+}
+function delStock(id){sd().stock=sd().stock.filter(x=>x.id!==id);saveAll();renderStock();}
+function renderStock(){
+  const search=val('stSearch').toLowerCase();
+  const list=sd().stock.filter(s=>!search||s.name.toLowerCase().includes(search));
+  const tb=document.getElementById('stockBody');if(!tb)return;
+  tb.innerHTML='';
+  set('mStockCount',sd().stock.length);
+  set('mLowStock',sd().stock.filter(s=>s.qty<=s.min).length);
+  set('mStockVal','Rs '+sd().stock.reduce((s,x)=>s+x.qty*x.price,0).toLocaleString());
+  if(!list.length){tb.innerHTML='<tr><td colspan="8" class="empty">Koi item nahi. Upar add karein.</td></tr>';return;}
+  list.forEach(s=>{
+    const pct=s.min>0?Math.min(100,Math.round(s.qty/s.min*50)):100;
+    const barColor=s.qty<=s.min?'#e24b4a':s.qty<=s.min*2?'#e65100':'#2a7a2a';
+    const status=s.qty<=s.min?'<span class="badge b-low">Low</span>':'<span class="badge b-ok">OK</span>';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="font-weight:600;">${s.name}</td>
+      <td>
+        <span style="font-weight:700;color:${s.qty<=s.min?'#c0392b':'#111'}">${s.qty}</span>
+        <div class="stock-bar-wrap"><div class="stock-bar" style="width:${pct}%;background:${barColor};"></div></div>
+      </td>
+      <td>${s.unit}</td>
+      <td>${s.min}</td>
+      <td>Rs ${s.price.toLocaleString()}</td>
+      <td>Rs ${(s.qty*s.price).toLocaleString()}</td>
+      <td>${status}</td>
+      <td style="display:flex;gap:4px;">
+        <button class="btn btn-black" style="height:27px;font-size:12px;padding:0 9px;" onclick="updateStockQty(${s.id},1)">+1</button>
+        <button class="btn btn-red" style="height:27px;font-size:12px;padding:0 9px;" onclick="updateStockQty(${s.id},-1)">-1</button>
+        <button class="del-btn" onclick="delStock(${s.id})">✕</button>
+      </td>`;
+    tb.appendChild(tr);
+  });
+}
+
+// ─── CUSTOMERS ────────────────────────────────────────────────────────────────
+function addCustomer(){
+  const name=val('cName').trim(),phone=val('cPhone').trim(),address=val('cAddress').trim();
+  if(!name)return;
+  if(sd().customers.find(c=>c.name.toLowerCase()===name.toLowerCase())){alert('Yeh customer pehle se hai!');return;}
+  sd().customers.push({id:Date.now(),name,phone,address,total:0});
+  saveAll();clr('cName','cPhone','cAddress');renderCustomers();updateCustDropdown();
+}
+function delCustomer(id){sd().customers=sd().customers.filter(x=>x.id!==id);saveAll();renderCustomers();updateCustDropdown();}
+function updateCustDropdown(){
+  const sel=document.getElementById('sCust');if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">-- Customer (opt) --</option>';
+  sd().customers.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;if(c.id==cur)o.selected=true;sel.appendChild(o);});
+}
+function renderCustomers(){
+  const list=sd().customers;
+  const tb=document.getElementById('custBody');if(!tb)return;
+  tb.innerHTML='';
+  set('mCustCount',list.length);
+  const withU=list.filter(c=>{
+    const u=sd().udhaar.filter(u=>u.name.toLowerCase()===c.name.toLowerCase()&&(u.amt-(u.paid||0))>0);
+    return u.length>0;
+  });
+  set('mCustUdhaar',withU.length);
+  if(!list.length){tb.innerHTML='<tr><td colspan="7" class="empty">Koi customer nahi.</td></tr>';return;}
+  list.forEach(c=>{
+    const uPending=sd().udhaar.filter(u=>u.name.toLowerCase()===c.name.toLowerCase()).reduce((s,u)=>s+(u.amt-(u.paid||0)),0);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="font-weight:600;">${c.name}</td>
+      <td>${c.phone||'-'}</td>
+      <td>${c.address||'-'}</td>
+      <td>Rs ${(c.total||0).toLocaleString()}</td>
+      <td style="color:${uPending>0?'#c0392b':'#2a7a2a'};font-weight:600;">Rs ${uPending.toLocaleString()}</td>
+      <td style="display:flex;gap:5px;">
+        ${c.phone?`<button class="btn btn-wa" style="height:27px;font-size:12px;padding:0 9px;" onclick="window.open('https://wa.me/92${c.phone.replace(/^0/,'')}','_blank')">WhatsApp</button>`:''}
+        <button class="btn btn-bill" style="height:27px;font-size:12px;padding:0 9px;" onclick="openBillModal(${c.id})">🧾 Bill</button>
+        <button class="btn" style="height:27px;font-size:12px;padding:0 9px;background:#6a1b9a;color:#fff;" onclick="openHistoryModal(${c.id})">📅 History</button>
+      </td>
+      <td><button class="del-btn" onclick="delCustomer(${c.id})">✕</button></td>`;
+    tb.appendChild(tr);
+  });
+}
+
+// ─── REPORT ───────────────────────────────────────────────────────────────────
+function renderReport(){
+  const now=new Date();
+  let wS=0,wE=0,mS=0,mE=0;
+  const allKeys=new Set([...Object.keys(sd().sales),...Object.keys(sd().expenses)]);
+  allKeys.forEach(k=>{
+    const d=new Date(k);const diff=(now-d)/86400000;
+    if(diff<=7){wS+=getDaySales(k);wE+=getDayExp(k);}
+    if(d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear()){mS+=getDaySales(k);mE+=getDayExp(k);}
+  });
+  set('mWeekSale','Rs '+wS.toLocaleString());set('mWeekExp','Rs '+wE.toLocaleString());set('mWeekProfit','Rs '+(wS-wE).toLocaleString());
+  set('mMonthSale','Rs '+mS.toLocaleString());set('mMonthProfit','Rs '+(mS-mE).toLocaleString());
+  // charts
+  const labels=[],sVals=[],eVals=[];
+  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);d.setHours(0,0,0,0);labels.push(d.toLocaleDateString('en-PK',{weekday:'short',day:'numeric'}));sVals.push(getDaySales(dk(d)));eVals.push(getDayExp(dk(d)));}
+  const wc=document.getElementById('chartWeek');
+  if(wc){if(chartW){chartW.destroy();chartW=null;}chartW=new Chart(wc,{type:'bar',data:{labels,datasets:[{label:'Sales',data:sVals,backgroundColor:'#378ADD',borderRadius:5,borderSkipped:false},{label:'Expenses',data:eVals,backgroundColor:'#e24b4a',borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{font:{size:11},boxWidth:10,padding:12}},tooltip:{callbacks:{label:ctx=>'Rs '+ctx.parsed.y.toLocaleString()}}},scales:{x:{ticks:{font:{size:11},color:'#999'},grid:{display:false},border:{display:false}},y:{ticks:{font:{size:11},color:'#999',callback:v=>'Rs '+v.toLocaleString()},grid:{color:'#f0efe8'},border:{display:false}}}}});}
+  const catT={};
+  Object.keys(sd().sales).forEach(k=>{const d=new Date(k);if(d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear()){(sd().sales[k]||[]).forEach(e=>{catT[e.cat]=(catT[e.cat]||0)+e.amt*e.qty;});}});
+  const cc=document.getElementById('chartCat');
+  if(cc&&Object.keys(catT).length){if(chartC){chartC.destroy();chartC=null;}chartC=new Chart(cc,{type:'doughnut',data:{labels:Object.keys(catT),datasets:[{data:Object.values(catT),backgroundColor:['#378ADD','#2a7a2a','#e65100','#880e4f','#6a1b9a'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'right',labels:{font:{size:12},boxWidth:10,padding:10}},tooltip:{callbacks:{label:ctx=>`${ctx.label}: Rs ${ctx.parsed.toLocaleString()}`}}}}});}
+}
+
+// ─── EXPORT ───────────────────────────────────────────────────────────────────
+function exportCSV(){
+  let csv='Date,Product,Category,Customer,Qty,Price,Total\n';
+  Object.keys(sd().sales).sort().forEach(k=>{
+    (sd().sales[k]||[]).forEach(e=>{
+      const cn=e.cust?(sd().customers.find(c=>c.id==e.cust)||{}).name||'':'';
+      csv+=`${k},"${e.name}","${e.cat}","${cn}",${e.qty},${e.amt},${e.amt*e.qty}\n`;
+    });
+  });
+  dl(new Blob([csv],{type:'text/csv'}),'sales.csv');
+}
+function exportJSON(){dl(new Blob([JSON.stringify({shops,data:D},null,2)],{type:'application/json'}),'shop_backup.json');}
+function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href);}
+
+// ─── MASTER RENDER ────────────────────────────────────────────────────────────
+function render(){
+  document.querySelectorAll('.cur-date').forEach(el=>el.textContent=fmtDate(currentDate));
+  renderSales();renderExpenses();renderUdhaar();renderStock();renderCustomers();renderReport();renderCash();
+}
+
+// ─── KEYBOARD ─────────────────────────────────────────────────────────────────
+['sName','sAmt','sQty','eName','eAmt','uAmt','stQty','cName','cPhone'].forEach((id,i,arr)=>{
+  const el=document.getElementById(id);
+  if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter'){if(id==='sQty'||id==='eAmt'||id==='uAmt'||id==='cPhone'){const fn={sQty:addSale,eAmt:addExpense,uAmt:addUdhaar,cPhone:addCustomer}[id];if(fn)fn();}else{const next=document.getElementById(arr[i+1]);if(next)next.focus();}}});
+});
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+loadAll();
+renderShopBar();
+document.getElementById('shopTitle').textContent='🛒 '+(shops.find(s=>s.id===curShopId)||shops[0]).name;
+updateCustDropdown();
+render();
+
+
+// ─── BILL / INVOICE ──────────────────────────────────────────────────────────
+let billCustId = null;
+let billItems = [];
+
+function openBillModal(custId) {
+  billCustId = custId;
+  billItems = [];
+  const c = sd().customers.find(x => x.id === custId);
+  if (!c) return;
+  document.getElementById('billCustInfo').innerHTML = `
+    <span style="font-size:17px;">${c.name}</span>
+    ${c.phone ? `<span style="font-size:13px;color:#888;margin-left:10px;">📞 ${c.phone}</span>` : ''}
+    ${c.address ? `<span style="font-size:13px;color:#888;margin-left:10px;">📍 ${c.address}</span>` : ''}
+  `;
+  document.getElementById('billModalSubtitle').textContent = c.name + ' ka bill';
+  document.getElementById('billItemName').value = '';
+  document.getElementById('billItemQty').value = '1';
+  document.getElementById('billItemPrice').value = '';
+  document.getElementById('billNote').value = '';
+  renderBillItems();
+  document.getElementById('billModal').classList.add('open');
+  setTimeout(() => document.getElementById('billItemName').focus(), 100);
+}
+
+function closeBillModal() {
+  document.getElementById('billModal').classList.remove('open');
+  billItems = [];
+  billCustId = null;
+}
+
+function addBillItem() {
+  const name = document.getElementById('billItemName').value.trim();
+  const qty = parseInt(document.getElementById('billItemQty').value) || 1;
+  const price = parseFloat(document.getElementById('billItemPrice').value);
+  if (!name || isNaN(price) || price < 0) {
+    document.getElementById('billItemName').focus();
+    return;
+  }
+  billItems.push({ id: Date.now(), name, qty, price });
+  document.getElementById('billItemName').value = '';
+  document.getElementById('billItemQty').value = '1';
+  document.getElementById('billItemPrice').value = '';
+  document.getElementById('billItemName').focus();
+  renderBillItems();
+}
+
+function removeBillItem(id) {
+  billItems = billItems.filter(x => x.id !== id);
+  renderBillItems();
+}
+
+function renderBillItems() {
+  const tb = document.getElementById('billItemsBody');
+  if (!tb) return;
+  if (!billItems.length) {
+    tb.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:1rem;color:#bbb;font-size:13px;">Koi item nahi</td></tr>';
+    document.getElementById('billGrandTotal').textContent = 'Rs 0';
+    document.getElementById('billTotalItems').textContent = '0';
+    return;
+  }
+  tb.innerHTML = '';
+  let grand = 0;
+  billItems.forEach(item => {
+    const tot = item.qty * item.price;
+    grand += tot;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td style="font-weight:600;">${item.name}</td>
+      <td>${item.qty}</td>
+      <td>Rs ${item.price.toLocaleString()}</td>
+      <td style="font-weight:700;">Rs ${tot.toLocaleString()}</td>
+      <td><button class="del-btn" onclick="removeBillItem(${item.id})">✕</button></td>`;
+    tb.appendChild(tr);
+  });
+  document.getElementById('billGrandTotal').textContent = 'Rs ' + grand.toLocaleString();
+  document.getElementById('billTotalItems').textContent = billItems.reduce((s, x) => s + x.qty, 0);
+}
+
+function saveBillAsSale() {
+  if (!billItems.length) { alert('Pehle koi item add karein!'); return; }
+  const key = dk(currentDate);
+  if (!sd().sales[key]) sd().sales[key] = [];
+  billItems.forEach(item => {
+    sd().sales[key].push({ id: Date.now() + Math.random(), name: item.name, cat: 'Other', amt: item.price, qty: item.qty, cust: billCustId });
+  });
+  // update customer total
+  const c = sd().customers.find(x => x.id === billCustId);
+  if (c) {
+    const total = billItems.reduce((s, x) => s + x.qty * x.price, 0);
+    c.total = (c.total || 0) + total;
+  }
+  saveAll();
+  alert('✅ Bill ki items sales mein save ho gayin!');
+  closeBillModal();
+  renderSales();
+  renderCustomers();
+}
+
+function printCustomerBill() {
+  if (!billItems.length) { alert('Pehle koi item add karein!'); return; }
+  const c = sd().customers.find(x => x.id === billCustId);
+  const shopName = (shops.find(s => s.id === curShopId) || {}).name || 'Shop';
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-PK', { day: 'numeric', month: 'long', year: 'numeric' });
+  const timeStr = now.toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit' });
+  const note = document.getElementById('billNote').value.trim();
+  const grand = billItems.reduce((s, x) => s + x.qty * x.price, 0);
+
+  let itemRows = billItems.map((item, i) =>
+    `<div class="pb-row">
+      <span>${i + 1}. ${item.name} x${item.qty}</span>
+      <span>Rs ${(item.qty * item.price).toLocaleString()}</span>
+    </div>`
+  ).join('');
+
+  const html = `
+    <div class="pb-shop">🛒 ${shopName}</div>
+    <div class="pb-sub">Cash Receipt / Bill</div>
+    <hr class="pb-divider"/>
+    <div class="pb-row"><span>Customer:</span><span><b>${c ? c.name : 'Guest'}</b></span></div>
+    ${c && c.phone ? `<div class="pb-row"><span>Phone:</span><span>${c.phone}</span></div>` : ''}
+    <div class="pb-row"><span>Date:</span><span>${dateStr}</span></div>
+    <div class="pb-row"><span>Time:</span><span>${timeStr}</span></div>
+    <hr class="pb-divider"/>
+    <div style="font-size:12px;font-weight:700;color:#999;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Items</div>
+    ${itemRows}
+    <div class="pb-total"><span>Grand Total:</span><span>Rs ${grand.toLocaleString()}</span></div>
+    ${note ? `<div style="margin-top:10px;font-size:12px;color:#666;">Note: ${note}</div>` : ''}
+    <hr class="pb-divider"/>
+    <div class="pb-footer">Shukriya! Dobara aaiye 🙏</div>
+  `;
+
+  const area = document.getElementById('printBillArea');
+  area.innerHTML = html;
+  area.style.display = 'block';
+  setTimeout(() => {
+    window.print();
+    area.style.display = 'none';
+  }, 200);
+}
+
+// close bill modal on backdrop click
+document.getElementById('billModal').addEventListener('click', function(e) { if (e.target === this) closeBillModal(); });
+
+// Enter key in bill item inputs
+['billItemName','billItemQty','billItemPrice'].forEach((id, i, arr) => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      if (id === 'billItemPrice') addBillItem();
+      else { const next = document.getElementById(arr[i + 1]); if (next) next.focus(); }
+    }
+  });
+});
+
+
+
+// ─── CASH DRAWER ──────────────────────────────────────────────────────────────
+function getCashData(key) {
+  if (!sd().cash) sd().cash = {};
+  if (!sd().cash[key]) sd().cash[key] = { open: 0 };
+  return sd().cash[key];
+}
+
+function saveCashOpen() {
+  const amt = parseFloat(document.getElementById('cashOpenAmt').value) || 0;
+  const key = dk(currentDate);
+  getCashData(key).open = amt;
+  saveAll();
+  renderCash();
+  const s = document.getElementById('cashOpenSaved');
+  s.style.display = 'inline';
+  setTimeout(() => s.style.display = 'none', 2000);
+}
+
+function calcDenom() {
+  let total = 0;
+  document.querySelectorAll('.denom-inp').forEach(inp => {
+    const qty = parseInt(inp.value) || 0;
+    const val = parseInt(inp.dataset.val) || 0;
+    total += qty * val;
+  });
+  document.getElementById('denomTotal').textContent = 'Rs ' + total.toLocaleString();
+}
+
+function renderCash() {
+  const key = dk(currentDate);
+  document.querySelectorAll('.cur-date').forEach(el => el.textContent = fmtDate(currentDate));
+  const cashData = getCashData(key);
+  const openBal = cashData.open || 0;
+  const sales = getDaySales(key);
+  const exp = getDayExp(key);
+  const inHand = openBal + sales - exp;
+  const closing = inHand;
+
+  document.getElementById('mCashOpen').textContent = 'Rs ' + openBal.toLocaleString();
+  document.getElementById('mCashSales').textContent = 'Rs ' + sales.toLocaleString();
+  document.getElementById('mCashExp').textContent = 'Rs ' + exp.toLocaleString();
+  document.getElementById('mCashHand').textContent = 'Rs ' + inHand.toLocaleString();
+  document.getElementById('mCashClose').textContent = 'Rs ' + closing.toLocaleString();
+
+  const inp = document.getElementById('cashOpenAmt');
+  if (inp && !inp.value) inp.value = openBal || '';
+
+  const tb = document.getElementById('cashSummaryBody');
+  if (tb) {
+    tb.innerHTML = `
+      <tr><td style="color:#888;">🌅 Opening Balance</td><td style="font-weight:700;color:#2a7a2a;">Rs ${openBal.toLocaleString()}</td></tr>
+      <tr><td style="color:#888;">📦 Today Sales</td><td style="font-weight:700;color:#378ADD;">+ Rs ${sales.toLocaleString()}</td></tr>
+      <tr><td style="color:#888;">💸 Today Expenses</td><td style="font-weight:700;color:#c0392b;">- Rs ${exp.toLocaleString()}</td></tr>
+      <tr class="total-row"><td>💰 Cash In Hand (Closing)</td><td style="font-size:16px;font-weight:700;color:${inHand>=0?'#2a7a2a':'#c0392b'};">Rs ${inHand.toLocaleString()}</td></tr>
+    `;
+  }
+}
+
+// ─── CUSTOMER HISTORY ─────────────────────────────────────────────────────────
+function openHistoryModal(custId) {
+  const c = sd().customers.find(x => x.id === custId);
+  if (!c) return;
+  document.getElementById('historyModalSubtitle').textContent = c.name + ' ki purchase history';
+
+  // Collect all sales for this customer across all dates
+  const allSales = [];
+  Object.keys(sd().sales).sort().reverse().forEach(dateKey => {
+    (sd().sales[dateKey] || []).forEach(sale => {
+      if (sale.cust == custId) {
+        allSales.push({ ...sale, dateKey });
+      }
+    });
+  });
+
+  const udhaarList = sd().udhaar.filter(u => u.name.toLowerCase() === c.name.toLowerCase());
+  const totalUdhaar = udhaarList.reduce((s, u) => s + (u.amt - (u.paid || 0)), 0);
+  const grandTotal = allSales.reduce((s, x) => s + x.amt * x.qty, 0);
+
+  let html = `
+    <div style="background:#f3e5f5;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;gap:20px;flex-wrap:wrap;">
+      <div><div style="font-size:11px;color:#888;font-weight:700;text-transform:uppercase;">Total Purchases</div><div style="font-size:17px;font-weight:700;color:#6a1b9a;">Rs ${grandTotal.toLocaleString()}</div></div>
+      <div><div style="font-size:11px;color:#888;font-weight:700;text-transform:uppercase;">Visits</div><div style="font-size:17px;font-weight:700;">${new Set(allSales.map(s=>s.dateKey)).size}</div></div>
+      <div><div style="font-size:11px;color:#888;font-weight:700;text-transform:uppercase;">Udhaar Baqi</div><div style="font-size:17px;font-weight:700;color:${totalUdhaar>0?'#c0392b':'#2a7a2a'};">Rs ${totalUdhaar.toLocaleString()}</div></div>
+    </div>
+  `;
+
+  if (!allSales.length) {
+    html += '<div style="text-align:center;padding:2rem;color:#bbb;font-size:14px;">Koi purchase history nahi.</div>';
+  } else {
+    // Group by date
+    const byDate = {};
+    allSales.forEach(s => {
+      if (!byDate[s.dateKey]) byDate[s.dateKey] = [];
+      byDate[s.dateKey].push(s);
+    });
+
+    Object.keys(byDate).sort().reverse().forEach(dateKey => {
+      const items = byDate[dateKey];
+      const dayTotal = items.reduce((s, x) => s + x.amt * x.qty, 0);
+      const d = new Date(dateKey);
+      const dLabel = d.toLocaleDateString('en-PK', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+      html += `
+        <div style="margin-bottom:10px;">
+          <div style="font-size:12px;font-weight:700;color:#6a1b9a;background:#f3e5f5;padding:5px 10px;border-radius:6px;margin-bottom:4px;display:flex;justify-content:space-between;">
+            <span>📅 ${dLabel}</span><span>Rs ${dayTotal.toLocaleString()}</span>
+          </div>
+          <div style="background:#fafaf8;border:1px solid #e0dfd7;border-radius:6px;overflow:hidden;">
+            <table style="width:100%;font-size:13px;border-collapse:collapse;">
+              ${items.map(x => `<tr style="border-bottom:1px solid #f0efe8;">
+                <td style="padding:6px 10px;">${x.name}</td>
+                <td style="padding:6px 10px;color:#888;">x${x.qty}</td>
+                <td style="padding:6px 10px;font-weight:700;">Rs ${(x.amt*x.qty).toLocaleString()}</td>
+              </tr>`).join('')}
+            </table>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  document.getElementById('historyContent').innerHTML = html;
+  document.getElementById('historyModal').classList.add('open');
+}
+
+function closeHistoryModal() {
+  document.getElementById('historyModal').classList.remove('open');
+}
+
+document.getElementById('historyModal').addEventListener('click', function(e) { if (e.target === this) closeHistoryModal(); });
+
+function toggleDark(){
+  const dark=document.body.classList.toggle('dark');
+  localStorage.setItem('ut_dark',dark?'1':'0');
+  const btn=document.getElementById('darkToggleBtn');
+  if(btn)btn.textContent=dark?'☀️ Light':'🌙 Dark';
+}
+function initDark(){
+  const d=localStorage.getItem('ut_dark');
+  if(d==='1'){document.body.classList.add('dark');const btn=document.getElementById('darkToggleBtn');if(btn)btn.textContent='☀️ Light';}
+}
+initDark();
+
+// ─── CHANGE PASSWORD ─────────────────────────────────────────────────────────
+function openChangePw(){document.getElementById('changePwModal').classList.add('open');document.getElementById('cpOld').focus();}
+function closeChangePw(){document.getElementById('changePwModal').classList.remove('open');['cpOld','cpNew','cpNew2'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';e.style.borderColor='#ddd';});const m=document.getElementById('cpMsg');if(m)m.style.display='none';}
+async function doChangePw(){
+  const old=document.getElementById('cpOld').value;
+  const nw=document.getElementById('cpNew').value;
+  const nw2=document.getElementById('cpNew2').value;
+  const msg=document.getElementById('cpMsg');
+  function showMsg(txt,color){msg.textContent=txt;msg.style.color=color;msg.style.display='block';setTimeout(()=>msg.style.display='none',3000);}
+  if(!old||!nw||!nw2)return showMsg('❗ Sab fields bharein','#c0392b');
+  if(nw!==nw2)return showMsg('❗ Naya password match nahi kiya','#c0392b');
+  if(nw.length<4)return showMsg('❗ Password kam az kam 4 characters ka hona chahiye','#c0392b');
+  const stored=localStorage.getItem('ut_ph');
+  const oldHash=await sha256(old);
+  let valid=false;
+  if(!stored){const def=await sha256('mastertech5363');valid=(oldHash===def);}
+  else{valid=(oldHash===stored);}
+  if(!valid){document.getElementById('cpOld').style.borderColor='#c0392b';return showMsg('❌ Purana password galat hai','#c0392b');}
+  const newHash=await sha256(nw);
+  localStorage.setItem('ut_ph',newHash);
+  showMsg('✅ Password kamyabi se badal gaya!','#2a7a2a');
+  setTimeout(closeChangePw,1500);
+}
+// Close modal on backdrop click
+document.getElementById('changePwModal').addEventListener('click',function(e){if(e.target===this)closeChangePw();});
+</script>
+</body>
+</html>
